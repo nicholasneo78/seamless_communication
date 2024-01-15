@@ -147,3 +147,5 @@ seamless_communication
 !*/seamless_communication
 m4t_scripts
 /ggml/test_data/
+
+m4t_dataset/

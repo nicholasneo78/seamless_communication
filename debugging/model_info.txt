@@ -1,0 +1,292 @@
+Model UnitYModel(
+  model_dim=1024
+  (speech_encoder_frontend): Wav2Vec2Frontend(
+    model_dim=1024, feature_dim=160
+    (feature_extractor): Wav2Vec2FbankFeatureExtractor(num_fbank_channels=80, stride=2, sample_every_k=1)
+    (post_extract_layer_norm): StandardLayerNorm(normalized_shape=(160,), eps=1e-05, elementwise_affine=True)
+    (model_dim_proj): Linear(input_dim=160, output_dim=1024, bias=True)
+    (first_pass_dropout): None
+    (pos_encoder): None
+    (layer_norm): None
+    (dropout): None
+  )
+  (speech_encoder): UnitYEncoderAdaptor(
+    model_dim=1024
+    (inner): StandardTransformerEncoder(
+      model_dim=1024, norm_order=TransformerNormOrder.POST
+      (layers): ModuleList(
+        (0-23): 24 x ConformerBlock(
+          model_dim=1024
+          (ffn1_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (ffn1): StandardFeedForwardNetwork(
+            model_dim=1024
+            (inner_proj): Linear(input_dim=1024, output_dim=4096, bias=True)
+            (inner_activation): SiLU()
+            (inner_dropout): None
+            (inner_layer_norm): None
+            (output_proj): Linear(input_dim=4096, output_dim=1024, bias=True)
+          )
+          (ffn1_dropout): None
+          (self_attn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (self_attn): StandardMultiheadAttention(
+            num_heads=16, model_dim=1024
+            (q_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (k_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (v_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (pos_encoder): None
+            (sdpa): ShawRelativePositionSDPA(
+              model_dim=1024, num_heads=16, max_left_rel_pos=64, max_right_rel_pos=8
+              (rel_k_embed): StandardEmbedding(num_embeddings=73, embedding_dim=64, init_fn=init_shaw_embedding)
+              (rel_v_embed): None
+              (inner_sdpa): TorchSDPA(attn_dropout_p=0.0)
+            )
+            (output_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_output_projection)
+          )
+          (self_attn_dropout): None
+          (conv_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (conv): ConformerConvolution(
+            model_dim=1024
+            (pointwise_conv1): Conv1d(1024, 2048, kernel_size=(1,), stride=(1,), bias=False)
+            (pointwise_conv1_activation): GLU(dim=1)
+            (depthwise_conv): Conv1d(1024, 1024, kernel_size=(31,), stride=(1,), groups=1024, bias=False)
+            (batch_norm): None
+            (layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+            (depthwise_activation): SiLU()
+            (pointwise_conv2): Conv1d(1024, 1024, kernel_size=(1,), stride=(1,), bias=False)
+          )
+          (conv_dropout): None
+          (ffn2_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (ffn2): StandardFeedForwardNetwork(
+            model_dim=1024
+            (inner_proj): Linear(input_dim=1024, output_dim=4096, bias=True)
+            (inner_activation): SiLU()
+            (inner_dropout): None
+            (inner_layer_norm): None
+            (output_proj): Linear(input_dim=4096, output_dim=1024, bias=True)
+          )
+          (ffn2_dropout): None
+          (layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (layer_norm): None
+    )
+    (inner_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+    (proj1): Linear(input_dim=1024, output_dim=4096, bias=True)
+    (activation): ReLU()
+    (proj2): Linear(input_dim=4096, output_dim=1024, bias=True)
+    (adaptor_layers): ModuleList(
+      (0): UnitYTransformerAdaptorLayer(
+        model_dim=1024, kernel_size=8, stride=8
+        (residual_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (residual_conv): Conv1d(1024, 2048, kernel_size=(8,), stride=(8,), padding=(4,))
+        (residual_activation): GLU(dim=1)
+        (self_attn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (self_attn_conv): Conv1d(1024, 2048, kernel_size=(8,), stride=(8,), padding=(4,))
+        (self_attn_activation): GLU(dim=1)
+        (self_attn): StandardMultiheadAttention(
+          num_heads=16, model_dim=1024
+          (q_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (k_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (v_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (pos_encoder): None
+          (sdpa): TorchSDPA(attn_dropout_p=0.1)
+          (output_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_output_projection)
+        )
+        (self_attn_dropout): Dropout(p=0.1, inplace=False)
+        (ffn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (ffn): StandardFeedForwardNetwork(
+          model_dim=1024
+          (inner_proj): Linear(input_dim=1024, output_dim=4096, bias=True)
+          (inner_activation): ReLU()
+          (inner_dropout): None
+          (inner_layer_norm): None
+          (output_proj): Linear(input_dim=4096, output_dim=1024, bias=True)
+        )
+        (ffn_dropout): Dropout(p=0.1, inplace=False)
+      )
+    )
+    (layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+  )
+  (text_encoder_frontend): TransformerEmbeddingFrontend(
+    model_dim=1024, no_scale=False
+    (embed): StandardEmbedding(num_embeddings=256102, embedding_dim=1024, pad_idx=0, init_fn=init_scaled_embedding)
+    (pos_encoder): SinusoidalPositionEncoder(encoding_dim=1024, max_seq_len=4096)
+    (layer_norm): None
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+  (text_encoder): StandardTransformerEncoder(
+    model_dim=1024, norm_order=TransformerNormOrder.PRE
+    (layers): ModuleList(
+      (0-23): 24 x StandardTransformerEncoderLayer(
+        model_dim=1024, norm_order=TransformerNormOrder.PRE
+        (self_attn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (self_attn): StandardMultiheadAttention(
+          num_heads=16, model_dim=1024
+          (q_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (k_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (v_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (pos_encoder): None
+          (sdpa): TorchSDPA(attn_dropout_p=0.1)
+          (output_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_output_projection)
+        )
+        (self_attn_norm): None
+        (self_attn_dropout): Dropout(p=0.1, inplace=False)
+        (ffn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (ffn): StandardFeedForwardNetwork(
+          model_dim=1024
+          (inner_proj): Linear(input_dim=1024, output_dim=8192, bias=True)
+          (inner_activation): ReLU()
+          (inner_dropout): None
+          (inner_layer_norm): None
+          (output_proj): Linear(input_dim=8192, output_dim=1024, bias=True)
+        )
+        (ffn_dropout): Dropout(p=0.1, inplace=False)
+      )
+    )
+    (layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+  )
+  (text_decoder_frontend): TransformerEmbeddingFrontend(
+    model_dim=1024, no_scale=False
+    (embed): StandardEmbedding(num_embeddings=256102, embedding_dim=1024, pad_idx=0, init_fn=init_scaled_embedding)
+    (pos_encoder): SinusoidalPositionEncoder(encoding_dim=1024, max_seq_len=4096)
+    (layer_norm): None
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+  (text_decoder): StandardTransformerDecoder(
+    model_dim=1024, self_attn_mask_factory=CausalAttentionMaskFactory(), norm_order=TransformerNormOrder.PRE
+    (layers): ModuleList(
+      (0-23): 24 x StandardTransformerDecoderLayer(
+        model_dim=1024, norm_order=TransformerNormOrder.PRE
+        (self_attn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (self_attn): StandardMultiheadAttention(
+          num_heads=16, model_dim=1024
+          (q_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (k_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (v_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (pos_encoder): None
+          (sdpa): TorchSDPA(attn_dropout_p=0.1)
+          (output_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_output_projection)
+        )
+        (self_attn_norm): None
+        (self_attn_dropout): Dropout(p=0.1, inplace=False)
+        (encoder_decoder_attn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (encoder_decoder_attn): StandardMultiheadAttention(
+          num_heads=16, model_dim=1024
+          (q_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (k_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (v_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+          (pos_encoder): None
+          (sdpa): TorchSDPA(attn_dropout_p=0.1)
+          (output_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_output_projection)
+        )
+        (encoder_decoder_attn_dropout): Dropout(p=0.1, inplace=False)
+        (ffn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+        (ffn): StandardFeedForwardNetwork(
+          model_dim=1024
+          (inner_proj): Linear(input_dim=1024, output_dim=8192, bias=True)
+          (inner_activation): ReLU()
+          (inner_dropout): None
+          (inner_layer_norm): None
+          (output_proj): Linear(input_dim=8192, output_dim=1024, bias=True)
+        )
+        (ffn_dropout): Dropout(p=0.1, inplace=False)
+      )
+    )
+    (layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+  )
+  (final_proj): TiedProjection(input_dim=1024, output_dim=256102)
+  (t2u_model): UnitYNART2UModel(
+    (encoder): StandardTransformerEncoder(
+      model_dim=1024, norm_order=TransformerNormOrder.PRE
+      (layers): ModuleList(
+        (0-5): 6 x StandardTransformerEncoderLayer(
+          model_dim=1024, norm_order=TransformerNormOrder.PRE
+          (self_attn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (self_attn): StandardMultiheadAttention(
+            num_heads=16, model_dim=1024
+            (q_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (k_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (v_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (pos_encoder): None
+            (sdpa): TorchSDPA(attn_dropout_p=0.0)
+            (output_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_output_projection)
+          )
+          (self_attn_norm): None
+          (self_attn_dropout): None
+          (ffn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (ffn): StandardFeedForwardNetwork(
+            model_dim=1024
+            (inner_proj): Linear(input_dim=1024, output_dim=8192, bias=True)
+            (inner_activation): ReLU()
+            (inner_dropout): None
+            (inner_layer_norm): None
+            (output_proj): Linear(input_dim=8192, output_dim=1024, bias=True)
+          )
+          (ffn_dropout): None
+        )
+      )
+      (layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+    )
+    (decoder_frontend): NARDecoderFrontend(
+      (embed): StandardEmbedding(num_embeddings=10082, embedding_dim=1024, pad_idx=1, init_fn=init_scaled_embedding)
+      (embed_char): StandardEmbedding(num_embeddings=10943, embedding_dim=1024, pad_idx=1, init_fn=init_scaled_embedding)
+      (unit_pos_encoder): SinusoidalPositionEncoder(encoding_dim=1024, max_seq_len=4096)
+      (char_pos_encoder): SinusoidalPositionEncoder(encoding_dim=1024, max_seq_len=4096)
+      (char_length_regulator): HardUpsampling()
+      (variance_adaptor): VarianceAdaptor(
+        (duration_predictor): VariancePredictor(
+          (conv1): Sequential(
+            (0): Conv1d(1024, 256, kernel_size=(3,), stride=(1,), padding=same)
+            (1): ReLU()
+          )
+          (ln1): StandardLayerNorm(normalized_shape=(256,), eps=1e-05, elementwise_affine=True)
+          (dropout_module): Dropout(p=0.5, inplace=False)
+          (conv2): Sequential(
+            (0): Conv1d(256, 256, kernel_size=(3,), stride=(1,), padding=same)
+            (1): ReLU()
+          )
+          (ln2): StandardLayerNorm(normalized_shape=(256,), eps=1e-05, elementwise_affine=True)
+          (proj): Linear(input_dim=256, output_dim=1, bias=True)
+          (film): None
+        )
+        (pitch_predictor): None
+        (embed_pitch): None
+        (vuv_predictor): None
+        (energy_predictor): None
+        (embed_energy): None
+        (length_regulator): HardUpsampling()
+      )
+      (layer_norm): None
+      (dropout): None
+    )
+    (decoder): FeedForwardTransformer(
+      , norm_order=TransformerNormOrder.PRE
+      (layers): ModuleList(
+        (0-5): 6 x FeedForwardTransformerLayer(
+          (self_attn): StandardMultiheadAttention(
+            num_heads=16, model_dim=1024
+            (q_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (k_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (v_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_qkv_projection)
+            (pos_encoder): None
+            (sdpa): TorchSDPA(attn_dropout_p=0.0)
+            (output_proj): Linear(input_dim=1024, output_dim=1024, bias=True, init_fn=init_output_projection)
+          )
+          (self_attn_dropout): None
+          (self_attn_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (conv1d): Conv1dBlock(
+            (conv1): Conv1d(1024, 1024, kernel_size=(7,), stride=(1,), padding=same)
+            (activation): ReLU()
+            (conv2): Conv1d(1024, 1024, kernel_size=(7,), stride=(1,), padding=same)
+          )
+          (conv1d_dropout): Dropout(p=0.1, inplace=False)
+          (conv1d_layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+          (film): None
+        )
+      )
+      (layer_norm): StandardLayerNorm(normalized_shape=(1024,), eps=1e-05, elementwise_affine=True)
+    )
+    (final_proj): TiedProjection(input_dim=1024, output_dim=10082)
+  )
+  (prosody_encoder_model): None
+)

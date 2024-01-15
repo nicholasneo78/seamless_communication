@@ -90,7 +90,12 @@ class UnitYFinetuneWrapper(nn.Module):
         self, batch: dataloader.MultimodalSeqsBatch
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         assert self.model.t2u_model is not None
+
+        # print(self.model.t2u_model)
+        # print(type(self.model.t2u_model))
+
         dummy_context = contextmanager(lambda: iter([None]))()
+        
         with torch.no_grad() if self.freeze_s2t else dummy_context:  # type:ignore
             assert batch.speech_to_text.src_tokens is not None
             seqs = batch.speech_to_text.src_tokens.to(self.device)
@@ -111,22 +116,40 @@ class UnitYFinetuneWrapper(nn.Module):
         if batch.text_to_units.prev_output_tokens is None:
             return (text_logits, None)
         dummy_context = contextmanager(lambda: iter([None]))()
+
         with torch.no_grad() if self.freeze_t2u else dummy_context:  # type:ignore
-            (
-                unit_encoder_out,
-                unit_encoder_padding_mask,
-            ) = self.model.t2u_model.encode(
-                text_decoder_output=text_decoder_out,
-                text_decoder_padding_mask=text_decoder_padding_mask,
-            )
+    
             seqs = batch.text_to_units.prev_output_tokens.to(self.device)
             seq_lens = batch.text_to_units.target_lengths.to(self.device)
+            
+            # auto-regressive model - m4t medium and m4t large
+
+            (unit_encoder_out, unit_encoder_padding_mask) = self.model.t2u_model.encode(
+                seqs=text_decoder_out,
+                padding_mask=text_decoder_padding_mask,
+            )
+
             unit_decoder_out, _ = self.model.t2u_model.decode(
                 seqs=seqs,
                 padding_mask=PaddingMask(seq_lens, seqs.size(1)),
                 encoder_output=unit_encoder_out,
                 encoder_padding_mask=unit_encoder_padding_mask,
             )
+
+            # non-autoregressive model - m4t large v2
+
+            # (unit_encoder_out, unit_encoder_padding_mask) = self.model.t2u_model.encode(
+            #     text_decoder_output=text_decoder_out,
+            #     text_decoder_padding_mask=text_decoder_padding_mask,
+            # )
+
+            # unit_decoder_out, _ = self.model.t2u_model.decode(
+            #     text_seqs=seqs,
+            #     # padding_mask=PaddingMask(seq_lens, seqs.size(1)),
+            #     encoder_output=unit_encoder_out,
+            #     encoder_padding_mask=unit_encoder_padding_mask,
+            # )
+            
             unit_logits = self.model.t2u_model.final_proj(unit_decoder_out)
 
         return (text_logits, unit_logits)

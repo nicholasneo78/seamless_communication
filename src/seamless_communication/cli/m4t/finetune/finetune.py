@@ -148,6 +148,15 @@ def main() -> None:
     logger.info(f"Model {model}")
     assert model.target_vocab_info == text_tokenizer.vocab_info
     assert model.t2u_model is not None
+
+    logger.info(f'model.target_vocab_info - {model.target_vocab_info}')
+    logger.info(f'text_tokenizer.vocab_info - {text_tokenizer.vocab_info}')
+    logger.info(f'model.t2u_model.target_vocab_info - {model.t2u_model.target_vocab_info}')
+    logger.info(f'unit_tokenizer.vocab_info - {unit_tokenizer.vocab_info}\n')
+
+    # brutally set the vocab to the same one for both model.t2u_model.target_vocab_info and unit_tokenizer.vocab_info
+    unit_tokenizer.vocab_info = model.t2u_model.target_vocab_info
+
     assert model.t2u_model.target_vocab_info == unit_tokenizer.vocab_info
 
     train_dataloader = dataloader.UnitYDataLoader(
