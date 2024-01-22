@@ -140,6 +140,7 @@ nohup.out
 multirun
 outputs
 
+m4t_dataset/
 
 # symlinks
 seamless_communication
