@@ -114,6 +114,10 @@ class Translator(nn.Module):
         self.model.eval()
         assert isinstance(self.model, UnitYModel)
 
+        # print("\n\n\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n")
+        # print(self.model.state_dict().items())
+        
+
         if text_tokenizer is None:
             self.text_tokenizer: TextTokenizer = load_unity_text_tokenizer(
                 model_name_or_card
@@ -152,6 +156,9 @@ class Translator(nn.Module):
                 vocoder_name_or_card, device=device, dtype=dtype
             )
             self.vocoder.eval()
+
+        print("\n\n\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n")
+        print(self.model.state_dict().items())
 
     @classmethod
     def get_prediction(

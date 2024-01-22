@@ -12,6 +12,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional, Tuple
 
+import os
 import torch
 import torch.distributed as dist
 import torch.nn as nn
@@ -91,7 +92,8 @@ class UnitYFinetuneWrapper(nn.Module):
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         assert self.model.t2u_model is not None
 
-        # print(self.model.t2u_model)
+        # print(self.model.state_dict().items())
+        # print('kkk')
         # print(type(self.model.t2u_model))
 
         dummy_context = contextmanager(lambda: iter([None]))()
@@ -366,11 +368,24 @@ class UnitYFinetune:
     def _save_model(self):
         logger.info("Saving model")
         if dist_utils.is_main_process():
+            logger.info(self.model.state_dict().items())
+            logger.info("SAVE SAVE SAVE")
             state_dict = {
                 key.replace("module.model.", ""): value
                 for key, value in self.model.state_dict().items()
             }
-            torch.save(state_dict, self.params.save_model_path)
+            # logger.info(self.model.state_dict().items())
+            # print()
+            # print()
+            # logger.info(f'State Dict: {state_dict}')
+            
+            # save the updated state dict
+            torch.save(state_dict, os.path.join(os.path.dirname(self.params.save_model_path), 'updated_state_dict.pt'))
+
+            # save the finetuned model
+            torch.save(self.model, self.params.save_model_path)
+
+
         if dist_utils.is_dist_initialized():
             dist.barrier()
 

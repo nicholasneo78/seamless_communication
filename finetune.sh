@@ -33,9 +33,10 @@ m4t_finetune \
 --train_dataset /seamless_communication/m4t_dataset/train_manifest.json \
 --eval_dataset /seamless_communication/m4t_dataset/dev_manifest.json \
 --batch_size 2 \
---learning_rate 5e-6 \
---warmup_steps 1165 \
---max_epochs 5 \
+--learning_rate 2e-6 \
+--warmup_steps 2330 \
+--max_epochs 2 \
 --patience 10 \
 --eval_steps 1165 \
+--log_steps 100 \
 --save_model_to /models/m4t_finetuned/checkpoint.pt

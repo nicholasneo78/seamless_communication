@@ -29,6 +29,9 @@ def convert_unity_checkpoint(
 ) -> Mapping[str, Any]:
     state_dict = checkpoint["model"]
 
+    # print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n\n\n")
+    # print(state_dict)
+
     # Check if we have a fairseq2 checkpoint.
     if "speech_encoder.inner.layers.0.self_attn_layer_norm.weight" in state_dict:
         return checkpoint

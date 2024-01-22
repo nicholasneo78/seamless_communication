@@ -145,7 +145,9 @@ def main() -> None:
     model: UnitYModel = load_unity_model(
         args.model_name, device=finetune_params.device, dtype=torch.float16
     )
-    logger.info(f"Model {model}")
+    # logger.info(f"Model {model}")
+    print(model.state_dict().items())
+    print('ddd')
     assert model.target_vocab_info == text_tokenizer.vocab_info
     assert model.t2u_model is not None
 
