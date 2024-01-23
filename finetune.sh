@@ -27,6 +27,8 @@
 
 # learning rate of 2e-5 is the default
 
+# default eval steps is 1165 (==1 epoch)
+
 m4t_finetune \
 --mode SPEECH_TO_TEXT \
 --model_name seamlessM4T_medium \
@@ -35,8 +37,8 @@ m4t_finetune \
 --batch_size 2 \
 --learning_rate 2e-6 \
 --warmup_steps 2330 \
---max_epochs 2 \
+--max_epochs 1 \
 --patience 10 \
---eval_steps 1165 \
+--eval_steps 800 \
 --log_steps 100 \
 --save_model_to /models/m4t_finetuned/checkpoint.pt

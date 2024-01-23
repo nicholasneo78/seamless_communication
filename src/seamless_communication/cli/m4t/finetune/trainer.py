@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Optional, Tuple
+import json
 
 import torch
 import torch.distributed as dist
@@ -277,6 +278,8 @@ class UnitYFinetune:
         self.is_best_state: bool = False
         torch.set_float32_matmul_precision("high")
 
+        print(self.model.parameters())
+
     def _reset_stats(self) -> None:
         self.train_loss_hist.reset()
         self.epoch_idx = 0
@@ -370,7 +373,27 @@ class UnitYFinetune:
                 key.replace("module.model.", ""): value
                 for key, value in self.model.state_dict().items()
             }
-            torch.save(state_dict, self.params.save_model_path)
+            # save the model parameters
+            torch.save(self.model, self.params.save_model_path)
+
+            # save the state_dict
+            torch.save(state_dict, "/models/m4t_finetuned/updated_state_dict.pt")
+
+            # save the layers of the model
+            # with open('/models/m4t_finetuned/model_layers.json', 'w+') as f:
+            #     json.dump(self.model.parameters(), f, indent=2)
+
+            # # save the layers of the state_dict
+            # with open('/models/m4t_finetuned/state_dict_layers.json', 'w+') as f:
+            #     json.dump(state_dict, f, indent=2)
+            print(state_dict)
+            print('\n\n########################################\n\n')
+            print(self.model.parameters())
+
+            print(type(state_dict))
+            print(type(self.model.parameters().items()))
+
+
         if dist_utils.is_dist_initialized():
             dist.barrier()
 

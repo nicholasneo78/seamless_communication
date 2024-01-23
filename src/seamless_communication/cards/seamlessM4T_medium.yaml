@@ -8,7 +8,7 @@ name: seamlessM4T_medium
 base: unity_nllb-200
 model_arch: medium
 checkpoint: /models/seamless-m4t-medium/multitask_unity_medium.pt
-# checkpoint: /models/m4t_finetuned/updated_state_dict.pt
+# checkpoint: /models/m4t_finetuned/checkpoint.pt
 tokenizer: /models/seamless-m4t-medium/tokenizer.model
 num_units: 10000
 unit_langs:
